@@ -1,0 +1,58 @@
+﻿# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.secret
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Uploads and temporary files
+uploads/*
+!uploads/.gitkeep
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Vector store binary indices (generated dynamically or via ingest script)
+data/vector_store/index.faiss
+data/vector_store/metadata.json
+!data/vector_store/.gitkeep
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+*.egg

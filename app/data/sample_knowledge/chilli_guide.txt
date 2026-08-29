@@ -1,0 +1,16 @@
+﻿Title: Chilli Integrated Pest and Disease Management
+Category: Pest Management
+Crop: Chilli
+Language: English
+Source: National Institute of Plant Health Management (NIPHM)
+
+1. Sucking Pests of Chilli:
+- Thrips (Scirtothrips dorsalis): Causes upward leaf curling, silvery patches on the underside of leaves, and bronzing. Manage using blue sticky traps (15-20/acre) and neem oil spray (3-5 ml/L). For severe cases, spray Fipronil 5 SC (1.5 ml/L) or Spinosad 45 SC (0.3 ml/L).
+- Mites (Polyphagotarsonemus latus): Causes downward curling of leaves with inverted boat-like shape and elongated petioles. Spray Spiromesifen 22.9 SC (1 ml/L) or Wettable Sulphur (3 g/L).
+- Aphids & Whiteflies: Vectors for Chilli Leaf Curl Virus. Spray Imidacloprid 17.8 SL (0.3 ml/L).
+
+2. Integrated Pest Management (IPM):
+- Install yellow and blue sticky traps at crop canopy height.
+- Spray 5% Neem Seed Kernel Extract (NSKE) at early crop stage.
+- Maintain border crops like maize or sorghum to act as windbreaks and pest barriers.
+- Observe 15-day pre-harvest intervals when synthetic chemicals are applied.

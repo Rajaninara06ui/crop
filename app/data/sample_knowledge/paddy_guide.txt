@@ -1,0 +1,16 @@
+﻿Title: Paddy Water and Nutrient Management Guide
+Category: Irrigation & Cultivation
+Crop: Paddy (Rice)
+Language: English
+Source: Directorate of Rice Research (ICAR-IIRR)
+
+1. Water Management for Paddy:
+- Vegetative Stage (Tillering): Maintain shallow water depth of 2-5 cm. Continuous deep flooding is unnecessary and wastes water.
+- Alternate Wetting and Drying (AWD): Allow water level in the field to drop 15 cm below soil surface before re-flooding to 5 cm depth. AWD saves 25-35% water without yield penalty.
+- Critical Growth Stages: Booting, heading, and flowering are moisture-critical stages. Never allow the field to dry during panicle initiation and flowering. Maintain 5 cm water.
+- Pre-Harvest Drainage: Drain all water 10 to 12 days before the expected harvest date to facilitate uniform grain ripening and mechanical harvesting.
+
+2. Nutrient Management in Paddy:
+- Recommended NPK: 120:60:40 kg/ha for high-yielding varieties.
+- Nitrogen Splits: 25% basal, 50% active tillering, 25% panicle initiation.
+- Zinc Application: Apply Zinc Sulphate (25 kg/ha) at transplanting in zinc-deficient soils to prevent 'Khaira' disease.

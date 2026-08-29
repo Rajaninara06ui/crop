@@ -1,0 +1,19 @@
+﻿Title: Tomato Cultivation and Disease Management Guide
+Category: Crop Cultivation & Diseases
+Crop: Tomato
+Language: English
+Source: ICAR - Indian Institute of Horticultural Research
+
+1. Yellowing Leaves in Tomato (Chlorosis):
+Causes:
+- Nitrogen Deficiency: Older leaves turn pale green to yellowish starting from the leaf tips. Growth is stunted.
+- Magnesium Deficiency: Common in sandy or acidic soils. Causes interveinal yellowing (chlorosis) on older leaves while veins remain green. Foliar spray of Magnesium Sulphate (Epsom Salt) at 5g/L water provides rapid correction.
+- Iron Deficiency: Yellowing of young upper leaves between veins, veins remain green.
+- Overwatering and Poor Drainage: Soil waterlogging suffocates roots, preventing oxygen and nutrient uptake, leading to overall yellow foliage.
+- Early Blight (Alternaria solani): Dark brown spots with concentric rings surrounded by yellow halo on lower leaves. Treat with Mancozeb 75 WP (2g/L) or Copper Oxychloride 50 WP (3g/L).
+
+2. Best Practices for Tomato:
+- Soil pH: Ideal 6.0 to 6.8 with good organic matter.
+- Irrigation: Drip irrigation is strongly recommended to prevent wet foliage and fungal spores.
+- Spacing: 60 cm x 45 cm for indeterminate varieties to ensure adequate ventilation.
+- Precautions: Avoid overhead sprinklers; remove diseased lower leaves; avoid excessive nitrogen fertilizer which predisposes plants to vegetative rank growth and diseases.

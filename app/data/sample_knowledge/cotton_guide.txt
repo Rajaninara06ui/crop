@@ -1,0 +1,16 @@
+﻿Title: Cotton Fertilizer and Pest Management Best Practices
+Category: Soil Nutrition & Pest Management
+Crop: Cotton
+Language: English
+Source: Central Institute for Cotton Research (ICAR-CICR)
+
+1. Fertilizer Schedule for Cotton:
+- Balanced NPK: Recommended dose is 120:60:60 kg/ha for Bt hybrid cotton.
+- Basal: 20% Nitrogen, 100% Phosphorus, 100% Potassium applied at sowing.
+- Top Dressing: 40% Nitrogen at square formation (45 DAS) and remaining 40% at peak flowering/boll development (65-70 DAS).
+- Micronutrients: Apply Zinc Sulphate (25 kg/ha) and Borax (10 kg/ha) to prevent boll shedding and square drop.
+- Foliar Spray: Spray 2% DAP or 1% 19:19:19 with 1% Magnesium Sulphate at flowering to reduce leaf reddening and boll drop.
+
+2. Precautions:
+- Do not apply high nitrogen during early vegetative stages to prevent excessive vegetative height.
+- Soil moisture must be adequate when top-dressing nitrogen fertilizers.
