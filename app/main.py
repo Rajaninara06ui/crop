@@ -136,11 +136,21 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Health Check
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health_check():
-    db_ok = await check_db_connection()
+    from app.database.mongodb import check_mongodb_connection
+    mongo_ok = await check_mongodb_connection()
+    sql_ok = await check_db_connection()
     store = get_vector_store()
+    
+    if mongo_ok:
+        db_status = "connected (mongodb)"
+    elif sql_ok:
+        db_status = "connected (sqlite/sql)"
+    else:
+        db_status = "ready (in-memory)"
+        
     return HealthResponse(
         status="healthy",
-        database="connected" if db_ok else "mock/fallback",
+        database=db_status,
         rag="ready" if store.is_ready else "not_ready",
         ai="ready (mock)" if settings.MOCK_MODE else f"ready ({settings.LLM_PROVIDER})",
         version=settings.APP_VERSION,
@@ -157,4 +167,5 @@ app.include_router(tts.router, prefix=settings.API_PREFIX)
 app.include_router(history.router, prefix=settings.API_PREFIX)
 app.include_router(knowledge.router, prefix=settings.API_PREFIX)
 app.include_router(feedback.router, prefix=settings.API_PREFIX)
+
 

@@ -22,9 +22,19 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     API_PREFIX: str = "/api"
 
-    ALLOWED_ORIGINS: Union[List[str], str] = ["http://localhost:5173", "http://localhost:3000"]
+    ALLOWED_ORIGINS: Union[List[str], str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:4173",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ]
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/farmer_ai"
+    # Database: MongoDB & SQL
+    DATABASE_TYPE: str = "mongodb"  # mongodb | sqlite | postgresql
+    MONGODB_URL: str = "mongodb://localhost:27017"
+    MONGODB_DB_NAME: str = "farmer_ai"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./farmer_ai.db"
 
     JWT_SECRET_KEY: str = "change_this_secret_key_in_production"
     JWT_ALGORITHM: str = "HS256"
@@ -62,11 +72,10 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
 
     MOCK_MODE: bool = True
+    ALLOW_ANONYMOUS_QUERY: bool = True
 
     WEATHER_PROVIDER: Optional[str] = None
     WEATHER_API_KEY: Optional[str] = None
-
-    ALLOW_ANONYMOUS_QUERY: bool = True
 
     @field_validator("ALLOWED_ORIGINS", mode="after")
     @classmethod
