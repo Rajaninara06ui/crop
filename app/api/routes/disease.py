@@ -24,8 +24,8 @@ def _get_disease_service() -> DiseaseService:
 @router.post("/detect", response_model=DiseaseDetectionResponse)
 async def detect_disease(
     image: UploadFile = File(..., description="Crop image (JPEG, PNG, WebP)"),
-    crop: Optional[str] = Form(None, description="Crop name hint (e.g. tomato, paddy)"),
-    language: Optional[str] = Form("en", description="Response language code"),
+    crop: Optional[str] = Form(None, description="Crop name hint (e.g. okra, tomato, brinjal)"),
+    language: Optional[str] = Form("en", description="Response language code (te, hi, en, etc.)"),
 ):
     image_bytes = await validate_image_upload(image)
 
@@ -44,17 +44,12 @@ async def detect_disease(
         )
 
     try:
+        lang_clean = (language or "en").lower().strip()
         service = _get_disease_service()
-        result = service.detect(image_bytes, crop_hint=crop)
+        result = service.detect(image_bytes, crop_hint=crop, language=lang_clean)
         
-        crop_val = result.crop or crop or "Tomato"
-        disease_val = result.possible_disease or "Tomato Early Blight"
-        prev_methods = result.prevention if result.prevention else [
-            "Use certified disease-free seeds",
-            "Maintain proper plant spacing for air circulation",
-            "Avoid overhead irrigation to prevent leaf moisture",
-            "Rotate crops to prevent pathogen buildup in soil"
-        ]
+        crop_val = result.crop or crop or ("పంట" if lang_clean == "te" else "Crop")
+        disease_val = result.possible_disease or ("తెగులు నిర్ధారణ" if lang_clean == "te" else "Crop Disease")
 
         return DiseaseDetectionResponse(
             crop_name=crop_val,
@@ -62,19 +57,11 @@ async def detect_disease(
             crop=crop_val,
             possible_disease=disease_val,
             confidence=result.confidence,
-            symptoms=result.symptoms if result.symptoms else [
-                "Dark circular spots on older leaves",
-                "Yellowing around lesions",
-                "Premature leaf drop"
-            ],
-            recommended_treatment=result.recommended_treatment if result.recommended_treatment else [
-                "Remove and destroy severely affected leaves",
-                "Apply copper-based fungicide or Mancozeb 75 WP (2g/L)",
-                "Improve field drainage and ventilation"
-            ],
-            prevention_methods=prev_methods,
-            prevention=prev_methods,
-            severity="medium" if result.confidence >= 0.70 else "low",
+            symptoms=result.symptoms,
+            recommended_treatment=result.recommended_treatment,
+            prevention_methods=result.prevention,
+            prevention=result.prevention,
+            severity=result.severity,
             warning=result.warning,
             is_demo=result.is_demo,
         )
