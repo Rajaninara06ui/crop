@@ -30,8 +30,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000"
     ]
 
-    # Database: MongoDB & SQL
-    DATABASE_TYPE: str = "mongodb"  # mongodb | sqlite | postgresql
+    # Database
+    DATABASE_TYPE: str = "mongodb"
     MONGODB_URL: str = "mongodb://localhost:27017"
     MONGODB_DB_NAME: str = "farmer_ai"
     DATABASE_URL: str = "sqlite+aiosqlite:///./farmer_ai.db"
@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # AI & Services
     LLM_PROVIDER: str = "openai"
     LLM_API_KEY: Optional[str] = None
     LLM_MODEL: str = "gpt-4o-mini"
@@ -58,10 +59,13 @@ class Settings(BaseSettings):
     TRANSLATION_PROVIDER: str = "google"
     TRANSLATION_API_KEY: Optional[str] = None
 
-    STT_PROVIDER: str = "openai"
+    # Speech to Text: sarvam | openai | whisper_local | mock
+    STT_PROVIDER: str = "sarvam"
     STT_API_KEY: Optional[str] = None
+    SARVAM_API_KEY: Optional[str] = None
 
-    TTS_PROVIDER: str = "google"
+    # Text to Speech: sarvam | google | openai | mock
+    TTS_PROVIDER: str = "sarvam"
     TTS_API_KEY: Optional[str] = None
 
     DISEASE_MODEL_PATH: Optional[str] = None
@@ -74,7 +78,8 @@ class Settings(BaseSettings):
     MOCK_MODE: bool = True
     ALLOW_ANONYMOUS_QUERY: bool = True
 
-    WEATHER_PROVIDER: Optional[str] = None
+    # Weather
+    WEATHER_PROVIDER: Optional[str] = "openweather"
     WEATHER_API_KEY: Optional[str] = None
 
     @field_validator("ALLOWED_ORIGINS", mode="after")

@@ -8,6 +8,18 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
+# Sarvam language code mapping
+SARVAM_LANG_MAP = {
+    "en": "en-IN",
+    "te": "te-IN",
+    "hi": "hi-IN",
+    "ta": "ta-IN",
+    "kn": "kn-IN",
+    "ml": "ml-IN",
+    "mr": "mr-IN",
+    "bn": "bn-IN",
+}
+
 
 class SpeechTranscriptionResult:
     def __init__(self, text: str, language: str, confidence: float) -> None:
@@ -22,11 +34,53 @@ class SpeechService(ABC):
         pass
 
 
+class SarvamSpeechService(SpeechService):
+    """
+    Sarvam AI (Saaras STT) for 22 Indian Languages.
+    """
+    API_URL = "https://api.sarvam.ai/speech-to-text"
+
+    def __init__(self) -> None:
+        self.api_key = settings.SARVAM_API_KEY or settings.STT_API_KEY
+
+    async def transcribe(self, audio_path: Path, language_hint: Optional[str] = None) -> SpeechTranscriptionResult:
+        if not self.api_key:
+            logger.info("Sarvam API key not set, using demo transcription.")
+            return await MockSpeechService().transcribe(audio_path, language_hint)
+
+        lang_code = SARVAM_LANG_MAP.get(language_hint or "en", "unknown")
+        headers = {"api-subscription-key": self.api_key}
+
+        async with httpx.AsyncClient(timeout=60) as client:
+            with open(audio_path, "rb") as f:
+                files = {"file": (audio_path.name, f, "audio/wav")}
+                data = {
+                    "model": "saaras:v2",
+                    "language_code": lang_code if lang_code != "unknown" else "te-IN",
+                    "with_diarization": "false",
+                }
+                resp = await client.post(self.API_URL, headers=headers, files=files, data=data)
+                resp.raise_for_status()
+                res_data = resp.json()
+
+        transcript = res_data.get("transcript", "")
+        detected_lang = res_data.get("language_code", language_hint or "te")
+        # normalise language code (e.g. te-IN -> te)
+        norm_lang = detected_lang.split("-")[0] if "-" in detected_lang else detected_lang
+        return SpeechTranscriptionResult(
+            text=transcript,
+            language=norm_lang,
+            confidence=0.96,
+        )
+
+
 class OpenAIWhisperService(SpeechService):
     def __init__(self) -> None:
         self.api_key = settings.STT_API_KEY or settings.LLM_API_KEY
 
     async def transcribe(self, audio_path: Path, language_hint: Optional[str] = None) -> SpeechTranscriptionResult:
+        if not self.api_key:
+            return await MockSpeechService().transcribe(audio_path, language_hint)
         async with httpx.AsyncClient(timeout=120) as client:
             with open(audio_path, "rb") as f:
                 files = {"file": (audio_path.name, f, "audio/mpeg")}
@@ -48,56 +102,27 @@ class OpenAIWhisperService(SpeechService):
         )
 
 
-class LocalWhisperService(SpeechService):
-    def __init__(self) -> None:
-        self._model = None
-
-    def _load(self):
-        if self._model is None:
-            import whisper
-            self._model = whisper.load_model("base")
-            logger.info("Loaded local Whisper model")
-        return self._model
-
-    async def transcribe(self, audio_path: Path, language_hint: Optional[str] = None) -> SpeechTranscriptionResult:
-        import asyncio
-        model = self._load()
-        loop = asyncio.get_event_loop()
-        opts = {}
-        if language_hint and language_hint != "en":
-            opts["language"] = language_hint
-        result = await loop.run_in_executor(None, lambda: model.transcribe(str(audio_path), **opts))
-        return SpeechTranscriptionResult(
-            text=result["text"].strip(),
-            language=result.get("language", language_hint or "en"),
-            confidence=0.90,
-        )
-
-
 class MockSpeechService(SpeechService):
     async def transcribe(self, audio_path: Path, language_hint: Optional[str] = None) -> SpeechTranscriptionResult:
         lang = language_hint or "en"
         demo_texts = {
-            "en": "My tomato plants have yellow leaves",
-            "te": "నా టమోటా ఆకులు పసుపు రంగులోకి మారుతున్నాయి",
-            "hi": "मेरे टमाटर के पत्ते पीले हो रहे हैं",
-            "ta": "என் தக்காளி இலைகள் மஞ்சளாக மாறுகின்றன",
-            "kn": "ನನ್ನ ಟೊಮೆಟೊ ಎಲೆಗಳು ಹಳದಿಯಾಗುತ್ತಿವೆ",
-            "ml": "എന്റെ തക്കാളി ഇലകൾ മഞ്ഞനിറമാകുന്നു",
-            "mr": "माझ्या टोमॅटोची पाने पिवळी पडत आहेत",
-            "bn": "আমার টমেটো পাতা হলুদ হয়ে যাচ্ছে",
+            "en": "My tomato plants have yellow leaves and I want to know what to do.",
+            "te": "నా టమోటా ఆకులు పసుపు రంగులోకి మారుతున్నాయి, ఏం చేయాలో చెప్పండి.",
+            "hi": "मेरे टमाटर के पौधों की पत्तियां पीली हो रही हैं, मुझे क्या करना चाहिए?",
+            "ta": "என் தக்காளி செடிகளுக்கு மஞ்சள் இலைகள் வருகின்றன, என்ன செய்வது?",
+            "kn": "ನನ್ನ ಟೊಮೆಟೊ ಗಿಡದ ಎಲೆಗಳು ಹಳದಿಯಾಗುತ್ತಿವೆ, ಏನು ಮಾಡಬೇಕು?",
+            "ml": "എന്റെ തക്കാളി ചെടിയുടെ ഇലകൾ മഞ്ഞനിറമാകുന്നു, എന്തുചെയ്യണം?",
+            "mr": "माझ्या टोमॅटोची पाने पिवळी पडत आहेत, काय करावे?",
+            "bn": "আমার টমেটো গাছের পাতা হলুদ হয়ে যাচ্ছে, কী করা উচিত?",
         }
         text = demo_texts.get(lang, demo_texts["en"])
         return SpeechTranscriptionResult(text=text, language=lang, confidence=0.94)
 
 
 def get_speech_service() -> SpeechService:
-    if settings.MOCK_MODE:
-        return MockSpeechService()
     provider = settings.STT_PROVIDER.lower()
-    if provider == "openai":
+    if provider == "sarvam":
+        return SarvamSpeechService()
+    elif provider == "openai":
         return OpenAIWhisperService()
-    elif provider == "whisper_local":
-        return LocalWhisperService()
-    logger.warning("Unknown STT provider '%s', using mock.", provider)
     return MockSpeechService()

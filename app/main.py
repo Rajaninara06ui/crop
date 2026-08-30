@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.api.routes import (
+    weather,
     auth,
     disease,
     feedback,
@@ -167,5 +168,7 @@ app.include_router(tts.router, prefix=settings.API_PREFIX)
 app.include_router(history.router, prefix=settings.API_PREFIX)
 app.include_router(knowledge.router, prefix=settings.API_PREFIX)
 app.include_router(feedback.router, prefix=settings.API_PREFIX)
+app.include_router(weather.router, prefix=settings.API_PREFIX)
+
 
 
