@@ -25,6 +25,7 @@ class AdvisoryService:
 
         retrieval_question = question.strip()
 
+        # Step 1: For vector retrieval, if needed translate query to EN
         if language in TRANSLATE_TO_EN_FOR_RETRIEVAL:
             try:
                 retrieval_question = await self.translator.translate(
@@ -34,9 +35,10 @@ class AdvisoryService:
             except Exception as exc:
                 logger.warning("Translation to EN failed: %s. Using original.", exc)
 
+        # Step 2: Query RAG & LLM with the target language
         rag_output = await self.rag.answer(
             question=retrieval_question,
-            language="en",
+            language=language,
             crop=crop,
             location=location,
         )
@@ -49,21 +51,26 @@ class AdvisoryService:
         precautions: List[str] = llm_result.get("precautions", [])
         expert_note = llm_result.get("when_to_contact_expert", "")
 
-        if language != "en":
-            try:
-                explanation = await self.translator.translate(explanation, "en", language)
-                if possible_issue:
-                    possible_issue = await self.translator.translate(possible_issue, "en", language)
-                if expert_note:
-                    expert_note = await self.translator.translate(expert_note, "en", language)
-                actions = [
-                    await self.translator.translate(a, "en", language) for a in actions
-                ]
-                precautions = [
-                    await self.translator.translate(p, "en", language) for p in precautions
-                ]
-            except Exception as exc:
-                logger.warning("Translation to %s failed: %s.", language, exc)
+        # Step 3: Check if LLM output needs translation (if returned in English when Telugu was asked)
+        # If the explanation is in English and user asked Telugu, translate it
+        if language != "en" and explanation and any(ord(c) < 128 for c in explanation[:20]):
+            # If explanation doesn't contain non-ASCII Indic characters, translate it
+            has_indic = any(ord(c) > 128 for c in explanation[:100])
+            if not has_indic:
+                try:
+                    explanation = await self.translator.translate(explanation, "en", language)
+                    if possible_issue:
+                        possible_issue = await self.translator.translate(possible_issue, "en", language)
+                    if expert_note:
+                        expert_note = await self.translator.translate(expert_note, "en", language)
+                    actions = [
+                        await self.translator.translate(a, "en", language) for a in actions
+                    ]
+                    precautions = [
+                        await self.translator.translate(p, "en", language) for p in precautions
+                    ]
+                except Exception as exc:
+                    logger.warning("Translation to %s failed: %s.", language, exc)
 
         sources = [
             SourceSchema(
@@ -76,7 +83,7 @@ class AdvisoryService:
             for c in chunks
         ]
 
-        confidence = float(llm_result.get("confidence", 0.75))
+        confidence = float(llm_result.get("confidence", 0.90))
 
         return {
             "answer": explanation,
@@ -84,7 +91,9 @@ class AdvisoryService:
             "sources": sources,
             "confidence": confidence,
             "possible_issue": possible_issue or None,
+            "explanation": explanation,
             "recommended_actions": actions,
             "precautions": precautions,
+            "expert_advice": expert_note or None,
             "when_to_contact_expert": expert_note or None,
         }
