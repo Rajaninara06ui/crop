@@ -72,6 +72,21 @@ async def chat_advisory(payload: ChatRequest):
     source_titles = [s.title for s in result.get("sources", [])]
     actions_text = "\n".join(result.get("recommended_actions", []))
 
+    follow_ups = [
+        "Are other nearby plants showing similar symptoms?",
+        "How frequently are you irrigating the crop?"
+    ]
+    if payload.language == "te":
+        follow_ups = [
+            "పక్కనున్న ఇతర మొక్కలకు కూడా ఇలాంటి లక్షణాలు కనిపిస్తున్నాయా?",
+            "మీరు పంటకు ఎన్ని రోజులకు ఒకసారి నీరు పెడుతున్నారు?"
+        ]
+    elif payload.language == "hi":
+        follow_ups = [
+            "क्या आसपास के अन्य पौधों में भी ऐसे लक्षण दिखाई दे रहे हैं?",
+            "आप कितने दिनों के अंतराल पर फसल की सिंचाई कर रहे हैं?"
+        ]
+
     return BackendChatResponse(
         success=True,
         language=payload.language,
@@ -80,14 +95,11 @@ async def chat_advisory(payload: ChatRequest):
         data=ChatData(
             intent="crop_advisory",
             crop=None,
-            possible_issue=result.get("possible_issue") or "Crop Advisory Guidance",
+            possible_issue=result.get("possible_issue") or ("వ్యవసాయ సలహా మార్గదర్శకం" if payload.language == "te" else "Crop Advisory Guidance"),
             recommendation=actions_text or result["answer"],
-            follow_up_questions=[
-                "Are other nearby plants showing similar symptoms?",
-                "How frequently are you irrigating the crop?"
-            ],
+            follow_up_questions=follow_ups,
             precautions=result.get("precautions", []),
-            sources=source_titles if source_titles else ["Agricultural Knowledge Base"],
+            sources=source_titles if source_titles else (["వ్యవసాయ విజ్ఞాన సమాచారం"] if payload.language == "te" else ["Agricultural Knowledge Base"]),
         ),
     )
 
@@ -108,7 +120,6 @@ async def query_advisory(
         )
 
     advisory = AdvisoryService()
-    history = HistoryService(db)
 
     try:
         result = await advisory.process(
@@ -126,7 +137,6 @@ async def query_advisory(
 
     conv_id = payload.conversation_id
     try:
-        # Save in MongoDB
         if not conv_id:
             m_conv = await MongoDBService.create_conversation(
                 user_id=str(current_user.id) if current_user else "anonymous",
